@@ -10,6 +10,8 @@ import UIKit
 
 class TodoItemTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var txtIndex: UILabel!
+    @IBOutlet weak var txtTodoItem: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -19,6 +21,16 @@ class TodoItemTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    /*!
+     * @discussion 這個函式使用viewModel設定cell
+     * @param viewModel
+     * @return Void
+     */
+    func configure(withViewModel viewModel: TodoItemPresenable ) -> (Void) {
+        txtIndex.text = viewModel.id
+        txtTodoItem.text = viewModel.textValue
     }
     
 }
