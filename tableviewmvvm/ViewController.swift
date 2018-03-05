@@ -7,7 +7,9 @@
 //
 
 import UIKit
-
+protocol TodoView:class {//協定：定義函式
+    func insertTodoItem() ->  ()
+}
 class ViewController: UIViewController {
 
     //畫面上的tableView
@@ -28,7 +30,7 @@ class ViewController: UIViewController {
         let myNib = UINib(nibName: "TodoItemTableViewCell", bundle: nil)
         tableViewItems.register(myNib, forCellReuseIdentifier: identifier)
         
-        viewModel = TodoViewModel()
+        viewModel = TodoViewModel(view: self)
     }
 
     override func didReceiveMemoryWarning() {
@@ -37,7 +39,12 @@ class ViewController: UIViewController {
     }
     //畫面上的按鈕事件
     @IBAction func onAddItem(_ sender: UIButton) {
-        
+        guard let newTodoValue = textFieldViewItem.text else {
+            print("No Value entered")
+            return
+        }
+        viewModel?.newTodoItem = newTodoValue
+        viewModel?.onAddTodoItem()
     }
 }
 extension ViewController : UITableViewDataSource{
@@ -52,6 +59,26 @@ extension ViewController : UITableViewDataSource{
         let itemViewModel = viewModel?.items[indexPath.row] //逐筆把viewModel模型內的資料帶入
         cell.configure(withViewModel: itemViewModel!)
         return cell
+    }
+}
+extension ViewController: UITableViewDelegate{
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let iteViewModel = viewModel?.items[indexPath.row]
+        let iv = iteViewModel as? TodoItemViewDelegate
+        iv?.onItemSelected()
+    }
+}
+extension ViewController:TodoView{
+    func insertTodoItem() {
+        guard let items = viewModel?.items else {
+            print("items object is empty")
+            return
+        }
+        self.textFieldViewItem.text = viewModel?.newTodoItem
+        
+        self.tableViewItems.beginUpdates()
+        self.tableViewItems.insertRows(at: [IndexPath(row: items.count - 1 ,section: 0)], with: .automatic)
+        self.tableViewItems.endUpdates()
     }
     
     
